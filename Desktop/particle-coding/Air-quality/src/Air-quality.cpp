@@ -15,10 +15,11 @@
 
 void setup();
 void loop();
-void getDustSesnsorReadings();
 #line 10 "/Users/talalagedeon/Desktop/particle-coding/Air-quality/src/Air-quality.ino"
 #define DUST_SENSOR_PIN D4
 #define SENSOR_READING_INTERVAL 30000
+#include <math.h>
+
 
 unsigned long lastInterval;
 unsigned long lowpulseoccupancy = 0;
@@ -27,6 +28,7 @@ unsigned long duration;
 
 float ratio = 0;
 float concentration = 0;
+void getDustSensorReadings();
 
 void setup() {
   Serial.begin(9600);
@@ -39,21 +41,17 @@ void setup() {
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
   duration = pulseIn( DUST_SENSOR_PIN, LOW);
-
   lowpulseoccupancy = lowpulseoccupancy + duration;
-
-    void getDustSesnsorReadings()
-  {
-  }
 
   if ((millis() - lastInterval) > SENSOR_READING_INTERVAL)
   {
+
     getDustSensorReadings();
 
     lowpulseoccupancy =0;
     lastInterval = millis();
   }
-  
+
   if (lowpulseoccupancy == 0)
   {
     lowpulseoccupancy = last_lpo;
