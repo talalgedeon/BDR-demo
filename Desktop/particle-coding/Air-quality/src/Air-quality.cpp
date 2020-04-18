@@ -16,6 +16,7 @@
 void setup();
 void loop();
 String getAirQuality();
+int getBMEValues(int &temp, int &pressure, int &humidity);
 void getDustSensorReadings();
 #line 10 "/Users/talalagedeon/Desktop/particle-coding/Air-quality/src/Air-quality.ino"
 #define DUST_SENSOR_PIN D4
@@ -23,7 +24,7 @@ void getDustSensorReadings();
 #define AQS_PIN A2
 #include <math.h>
 #include "Air_Quality_Sensor.h"
-#include "Air_Quality_Sensor.h"
+#include "Adafruit_BME280.h"
 
 AirQualitySensor aqSensor(AQS_PIN);
 Adafruit_BME280 bme;
@@ -66,15 +67,16 @@ else
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
+  int temp, pressure, humidity;
+
   duration = pulseIn( DUST_SENSOR_PIN, LOW);
   lowpulseoccupancy = lowpulseoccupancy + duration;
-  int temp, pressure, humidity;
 
   if ((millis() - lastInterval) > SENSOR_READING_INTERVAL)
   {
     String quality = getAirQuality();
     Serial.printlnf("Air Quality: %s", quality.c_str());
-    
+
     getBMEValues(temp, pressure, humidity);
     Serial.printlnf("Temp: %d", temp);
     Serial.printlnf("Pressure: %d", pressure);
@@ -112,6 +114,15 @@ String getAirQuality()
  return qual;
 }
 
+int getBMEValues(int &temp, int &pressure, int &humidity)
+{
+ temp = (int)bme.readTemperature();
+ pressure = (int)(bme.readPressure() / 100.0F);
+ humidity = (int)bme.readHumidity();
+
+ return 1;
+}
+
 void getDustSensorReadings()
 {
   // This particular dust sensor returns 0s often, so let's filter them out by making sure we only
@@ -132,3 +143,4 @@ void getDustSensorReadings()
   Serial.printlnf("Ratio: %f%%", ratio);
   Serial.printlnf("Concentration: %f pcs/L", concentration);
 }
+

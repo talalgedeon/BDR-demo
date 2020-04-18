@@ -10,9 +10,12 @@
 #define DUST_SENSOR_PIN D4
 #define SENSOR_READING_INTERVAL 30000
 #define AQS_PIN A2
+
 #include <math.h>
 #include "Air_Quality_Sensor.h"
-#include "Air_Quality_Sensor.h"
+#include "Adafruit_BME280.h"
+#include "SeeedOLED.h"
+
 
 AirQualitySensor aqSensor(AQS_PIN);
 Adafruit_BME280 bme;
@@ -42,6 +45,21 @@ void setup() {
    Serial.println("Air Quality Sensor ERROR!");
  }
 
+Wire.begin();
+SeeedOled.init();
+
+SeeedOled.clearDisplay();
+SeeedOled.setNormalDisplay();
+SeeedOled.setPageMode();
+
+SeeedOled.setTextXY(2, 0);
+SeeedOled.putString("Particle");
+SeeedOled.setTextXY(3, 0);
+SeeedOled.putString("Air Quality");
+SeeedOled.setTextXY(4, 0);
+SeeedOled.putString("Monitor");
+
+
  if (bme.begin())
 {
  Serial.println("BME280 Sensor ready.");
@@ -55,9 +73,10 @@ else
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
+  int temp, pressure, humidity;
+
   duration = pulseIn( DUST_SENSOR_PIN, LOW);
   lowpulseoccupancy = lowpulseoccupancy + duration;
-  int temp, pressure, humidity;
 
   if ((millis() - lastInterval) > SENSOR_READING_INTERVAL)
   {
@@ -130,3 +149,4 @@ void getDustSensorReadings()
   Serial.printlnf("Ratio: %f%%", ratio);
   Serial.printlnf("Concentration: %f pcs/L", concentration);
 }
+
