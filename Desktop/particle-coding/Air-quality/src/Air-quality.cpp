@@ -15,11 +15,16 @@
 
 void setup();
 void loop();
+String getAirQuality();
 void getDustSensorReadings();
 #line 10 "/Users/talalagedeon/Desktop/particle-coding/Air-quality/src/Air-quality.ino"
 #define DUST_SENSOR_PIN D4
 #define SENSOR_READING_INTERVAL 30000
+#define AQS_PIN A2
 #include <math.h>
+#include "Air_Quality_Sensor.h"
+
+AirQualitySensor aqSensor(AQS_PIN);
 
 
 unsigned long lastInterval;
@@ -36,6 +41,15 @@ void setup() {
   pinMode( DUST_SENSOR_PIN, INPUT);
   lastInterval = millis();
 
+  if (aqSensor.init())
+ {
+   Serial.println("Air Quality Sensor ready.");
+ }
+ else
+ {
+   Serial.println("Air Quality Sensor ERROR!");
+ }
+
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -45,12 +59,39 @@ void loop() {
 
   if ((millis() - lastInterval) > SENSOR_READING_INTERVAL)
   {
+    String quality = getAirQuality();
+    Serial.printlnf("Air Quality: %s", quality.c_str());
 
     getDustSensorReadings();
 
     lowpulseoccupancy =0;
     lastInterval = millis();
+
   }
+}
+String getAirQuality()
+{
+ int quality = aqSensor.slope();
+ String qual = "None";
+
+ if (quality == AirQualitySensor::FORCE_SIGNAL)
+ {
+   qual = "Danger";
+ }
+ else if (quality == AirQualitySensor::HIGH_POLLUTION)
+ {
+   qual = "High Pollution";
+ }
+ else if (quality == AirQualitySensor::LOW_POLLUTION)
+ {
+   qual = "Low Pollution";
+ }
+ else if (quality == AirQualitySensor::FRESH_AIR)
+ {
+   qual = "Fresh Air";
+ }
+
+ return qual;
 }
 
 void getDustSensorReadings()
