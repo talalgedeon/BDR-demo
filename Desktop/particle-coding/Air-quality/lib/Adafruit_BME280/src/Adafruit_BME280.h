@@ -21,11 +21,6 @@
 #ifndef __BME280_H__
 #define __BME280_H__
 
-#if (ARDUINO >= 100)
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
 
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
