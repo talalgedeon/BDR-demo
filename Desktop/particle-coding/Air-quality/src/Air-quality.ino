@@ -19,7 +19,6 @@ unsigned long duration;
 
 float ratio = 0;
 float concentration = 0;
-void getDustSensorReadings();
 
 void setup() {
   Serial.begin(9600);
@@ -42,22 +41,25 @@ void loop() {
     lowpulseoccupancy =0;
     lastInterval = millis();
   }
+}
 
+void getDustSensorReadings()
+{
+  // This particular dust sensor returns 0s often, so let's filter them out by making sure we only
+  // capture and use non-zero LPO values for our calculations once we get a good reading.
   if (lowpulseoccupancy == 0)
   {
     lowpulseoccupancy = last_lpo;
   }
   else
   {
-    last_lpo= lowpulseoccupancy;
+    last_lpo = lowpulseoccupancy;
   }
-  
-  ratio = lowpulseoccupancy / (SENSOR_READING_INTERVAL * 10.0);
-  concentration = 1.1 * pow(ratio, 3) - 3.8 * pow(ratio, 2) + 520 * ratio + 0.62;
+
+  ratio = lowpulseoccupancy / (SENSOR_READING_INTERVAL * 10.0);                   // Integer percentage 0=>100
+  concentration = 1.1 * pow(ratio, 3) - 3.8 * pow(ratio, 2) + 520 * ratio + 0.62; // using spec sheet curve
 
   Serial.printlnf("LPO: %d", lowpulseoccupancy);
   Serial.printlnf("Ratio: %f%%", ratio);
   Serial.printlnf("Concentration: %f pcs/L", concentration);
-
-
 }
