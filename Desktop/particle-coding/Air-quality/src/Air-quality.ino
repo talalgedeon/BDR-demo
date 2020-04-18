@@ -63,7 +63,7 @@ void loop() {
   {
     String quality = getAirQuality();
     Serial.printlnf("Air Quality: %s", quality.c_str());
-    
+
     getBMEValues(temp, pressure, humidity);
     Serial.printlnf("Temp: %d", temp);
     Serial.printlnf("Pressure: %d", pressure);
@@ -99,6 +99,15 @@ String getAirQuality()
  }
 
  return qual;
+}
+
+int getBMEValues(int &temp, int &pressure, int &humidity)
+{
+ temp = (int)bme.readTemperature();
+ pressure = (int)(bme.readPressure() / 100.0F);
+ humidity = (int)bme.readHumidity();
+
+ return 1;
 }
 
 void getDustSensorReadings()

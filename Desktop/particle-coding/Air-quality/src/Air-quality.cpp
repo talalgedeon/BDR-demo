@@ -23,8 +23,11 @@ void getDustSensorReadings();
 #define AQS_PIN A2
 #include <math.h>
 #include "Air_Quality_Sensor.h"
+#include "Air_Quality_Sensor.h"
 
 AirQualitySensor aqSensor(AQS_PIN);
+Adafruit_BME280 bme;
+
 
 
 unsigned long lastInterval;
@@ -50,17 +53,32 @@ void setup() {
    Serial.println("Air Quality Sensor ERROR!");
  }
 
+ if (bme.begin())
+{
+ Serial.println("BME280 Sensor ready.");
+}
+else
+{
+ Serial.println("BME280 Sensor ERROR!");
+}
+
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
   duration = pulseIn( DUST_SENSOR_PIN, LOW);
   lowpulseoccupancy = lowpulseoccupancy + duration;
+  int temp, pressure, humidity;
 
   if ((millis() - lastInterval) > SENSOR_READING_INTERVAL)
   {
     String quality = getAirQuality();
     Serial.printlnf("Air Quality: %s", quality.c_str());
+    
+    getBMEValues(temp, pressure, humidity);
+    Serial.printlnf("Temp: %d", temp);
+    Serial.printlnf("Pressure: %d", pressure);
+    Serial.printlnf("Humidity: %d", humidity);
 
     getDustSensorReadings();
 
